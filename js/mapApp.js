@@ -159,9 +159,13 @@ function googleMarkers(markers) {
       map: map,
       position: position,
       title: title,
+      draggable: true,
       animation: google.maps.Animation.DROP,
       icon: defaultIcon,
       id: i
+    });
+    marker.addListener('click', function() {
+      populateInfoWindow(this, infoWindow);
     });
 
     // Push the marker to our array of markers.
@@ -179,12 +183,8 @@ function viewModel() {
       map.setCenter(mapData.center);
     };
 
-
-
    this.markers = new markerViewModel();
    this.googleMarkers = new googleMarkers(this.markers);
-
-
 
    this.markersFilter = ko.dependentObservable(function() {
        var search = self.query().toLowerCase();
@@ -194,15 +194,14 @@ function viewModel() {
           }
 
        }, this);
-      //  marker.addListener('click', function() {
-      //    populateInfoWindow(this, InfoWindow);
-      //  });
 
        return filter;
    });
 }
 
 ko.applyBindings(viewModel);
+
+var infoWindow = new google.maps.InfoWindow();
 
 function populateInfoWindow(marker) {
   console.log(marker.title, 'clicked');
@@ -217,9 +216,17 @@ function populateInfoWindow(marker) {
       infoWindow.marker = null;
     });
   }
+  if (marker.getAnimation() !== null) {
+    marker.setAnimation(null);
+  }
+  else {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function(){
+      marker.setAnimation(null);
+    }, 750);
+  }
 }
 
-var infoWindow = new google.maps.InfoWindow();
 
 // This function populates the infowindow when the marker is clicked. We'll only allow
 // one infowindow which will open at the marker that is clicked, and populate based
