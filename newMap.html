@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/map.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+  </head>
+<body>
+  <div class="container-fluid">
+      <div class="options-box">
+        <h1>My Neighborhood Map</h1>
+        <div>
+          <input type="text" class="form-control" id="input" placeholder="Search" data-bind="textInput: query, valueUpdate: 'keydown'" autocomplete="off">
+          <div id="scroller">
+              <ul data-bind="template: { name: 'marker', foreach: markersFilter }" class="list-group border-0"></ul>
+              <script type="text/html" id="marker">
+                  <li class="list-group-item">
+                     <a href="#" data-bind="attr: {title: title}">
+                        <strong data-bind="text: title, click: populateInfoWindow"></strong>
+                     </a>
+                  </li>
+              </script>
+          </div>
+        </div>
+        <button id="show-markers" type="button" class="btn btn-primary" data-bind="click: showMarkers" name="button">Show Markers</button>
+        <button id="hide-markers" type="button" class="btn btn-default" data-bind="click: hideMarkers" name="button">Hide Markers</button>
+        <hr>
+      </div>
+      <hr>
+      <div class = "options-box">
+        <input id="zoom-to-area-text" type="text" class="form-control" placeholder="Insert Area">
+        <button id="zoom-to-area" type="button" class="btn btn-default" name="button">Search</button>
+      </div>
+      <div>
+        <span class="text"> Within </span>
+        <select id="max-duration">
+          <option value="10">10 min</option>
+          <option value="15">15 min</option>
+          <option value="30">30 min</option>
+          <option value="60">1 hour</option>
+        </select>
+        <select id="mode">
+          <option value="DRIVING">drive</option>
+          <option value="WALKING">walk</option>
+          <option value="BICYCLING">bike</option>
+          <option value="TRANSIT">transit ride</option>
+        </select>
+        <span class="text">of</span>
+        <input id="search-within-time-text" type="text" placeholder="Ex: Google Office NYC or 75 9th Ave, New York, NY">
+        <input id="search-within-time" type="button" value="Go">
+      </div>
+      <hr>
+      <div class= "options-box">
+        <span class="text">Search for nearby places</span>
+        <input id="places-search" type="text" placeholder="Ex: Pizza delivery in NYC">
+        <input id="go-places" type="button" value="Go">
+      </div>
+    </div>
+
+
+  </div>
+  <div id="map"></div>
+  <script>
+  var map;
+  function initMap() {
+    // Constructor creates a new map - only center and zoom are required.
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: {lat: 32.750873, lng: -117.099478},
+      zoom: 13
+      });
+    }
+  </script>
+  <script async defer
+        src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyBTZYzfTbP3yeBifwXQZm9VR9p5okWxyP4&v=3&callback=initMap">
+  </script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+   <script async type="text/javascript" src="js/mapApp.js"></script>
+</body>
+</html>
