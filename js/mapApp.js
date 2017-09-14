@@ -10,12 +10,6 @@
 
 var markers = [];
 
-// This global polygon variable is to ensure only ONE polygon is rendered.
-var polygon = null;
-
-// Create placemarkers array to use in multiple functions to have control
-// over the number of places that show.
-var placeMarkers = ko.observableArray([]);
 
 function markerViewModel() {
     // model info
@@ -28,7 +22,6 @@ function markerViewModel() {
     ];
 
     return ko.observable(locations);
-
 
 }
 
@@ -207,15 +200,45 @@ function populateInfoWindow(marker) {
   console.log(marker.title, 'clicked');
   // Check to make sure the infowindow is not already opened on this marker.
   if (infoWindow.marker != marker) {
-         infoWindow.marker = marker;
+       infoWindow.marker = marker;
 
-         infoWindow.setContent('<div>' + marker.title + '</div>');
-         infoWindow.open(map, marker);
+       infoWindow.setContent('');
+       var streetViewService = new google.maps.StreetViewService();
+       var radius = 50;
+       // In case the status is OK, which means the pano was found, compute the
+       // position of the streetview image, then calculate the heading, then get a
+       // panorama from that and set the options
+       function getStreetView(data, status) {
+         if (status == google.maps.StreetViewStatus.OK) {
+           var nearStreetViewLocation = data.location.latLng;
+           var heading = google.maps.geometry.spherical.computeHeading(
+             nearStreetViewLocation, marker.position);
+             infoWindow.setContent('<div>' + marker.title + '</div><div id="pano"></div>');
+             var panoramaOptions = {
+               position: nearStreetViewLocation,
+               pov: {
+                 heading: heading,
+                 pitch: 20
+               }
+             };
+           var panorama = new google.maps.StreetViewPanorama(
+             document.getElementById('pano'), panoramaOptions);
+         } else {
+           infoWindow.setContent('<div>' + marker.title + '</div>' +
+             '<div>No Street View Found</div>');
+         }
+       }
+       // Use streetview service to get the closest streetview image within
+       // 50 meters of the markers position
+       streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+       // Open the infowindow on the correct marker.
+       infoWindow.open(map, marker);
+     }
     // Make sure the marker property is cleared if the infowindow is closed.
       infoWindow.addListener('closeclick', function() {
       infoWindow.marker = null;
     });
-  }
+
   if (marker.getAnimation() !== null) {
     marker.setAnimation(null);
   }
@@ -226,6 +249,7 @@ function populateInfoWindow(marker) {
     }, 750);
   }
 }
+
 
 
 function mapErrorAlert() {
