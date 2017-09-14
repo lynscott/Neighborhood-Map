@@ -61,21 +61,21 @@ function showMarkers() {
   var bounds = new google.maps.LatLngBounds();
   // Extend the boundaries of the map for each marker and display the marker
   for (var i = 0; i < googleMarkers().length; i++) {
-    var marker = googleMarkers()[i]
+    var marker = googleMarkers()[i];
     marker.setMap(map);
     bounds.extend(marker.position);
   }
 
   map.fitBounds(bounds);
-};
+}
 
 //This function will hide all markers on initial list of markers.
 function hideMarkers() {
   for (var i = 0; i < googleMarkers().length; i++) {
-    var marker = googleMarkers()[i]
+    var marker = googleMarkers()[i];
     marker.setMap(null);
   }
-};
+}
 
 
 
@@ -103,7 +103,7 @@ var geocoder = new google.maps.Geocoder();
 // Get the address or place that the user entered.
 var address = document.getElementById('zoom-to-area-text').value;
 // Make sure the address isn't blank.
-if (address == '') {
+if (address === '') {
   window.alert('You must enter an area, or address.');
 } else {
   // Geocode the address/area entered to get the center. Then, center the map
@@ -126,7 +126,7 @@ if (address == '') {
 
 // This function will create google markers from the initial set of locations
 function googleMarkers(markers) {
-  var googleMarkers = []
+  var googleMarkers = [];
   for (var i = 0; i < markers().length; i++) {
     // Get the position from the location array.
     var position = markers()[i].location;
@@ -141,11 +141,11 @@ function googleMarkers(markers) {
       icon: defaultIcon,
       id: i
     });
-    //add listener for info window function to each marker
+
+    //Populate info window and attach listener to each marker
     marker.addListener('click', function() {
       populateInfoWindow(this, infoWindow);
     });
-
     // Push the marker to our array of markers.
     googleMarkers.push(marker);
   }
@@ -168,7 +168,7 @@ function populateInfoWindow(marker) {
        // In case the status is OK, which means the pano was found, compute the
        // position of the streetview image, then calculate the heading, then get a
        // panorama from that and set the options
-       function getStreetView(data, status) {
+       var getStreetView = function(data, status) {
          if (status == google.maps.StreetViewStatus.OK) {
            var nearStreetViewLocation = data.location.latLng;
            var heading = google.maps.geometry.spherical.computeHeading(
