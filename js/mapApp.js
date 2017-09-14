@@ -1,7 +1,20 @@
+//Google maps api
 
 var markers = [];
 
+// Style the markers a bit.
+var defaultIcon = makeMarkerIcon('0091ff');
 
+//Listener for area zoom function
+document.getElementById('zoom-to-area').addEventListener('click', zoomToArea );
+
+// Create a "highlighted location" marker color for when the user
+// mouses over the marker.
+var highlightedIcon = makeMarkerIcon('FFFF24');
+
+var infoWindow = new google.maps.InfoWindow();
+
+//Model for static data points
 function markerViewModel() {
     // model info
     var locations = [
@@ -17,148 +30,7 @@ function markerViewModel() {
 }
 
 
-
-// This function will loop through the markers array and display them all.
-function showMarkers() {
-  var bounds = new google.maps.LatLngBounds();
-  // Extend the boundaries of the map for each marker and display the marker
-  for (var i = 0; i < googleMarkers().length; i++) {
-    var marker = googleMarkers()[i]
-    marker.setMap(map);
-    bounds.extend(marker.position);
-  }
-
-  map.fitBounds(bounds);
-};
-
-function hideMarkers() {
-  for (var i = 0; i < googleMarkers().length; i++) {
-    var marker = googleMarkers()[i]
-    marker.setMap(null);
-  }
-};
-
-
-
-// This function takes in a COLOR, and then creates a new marker
-// icon of that color. The icon will be 21 px wide by 34 high, have an origin
-// of 0, 0 and be anchored at 10, 34).
-function makeMarkerIcon(markerColor) {
-  var markerImage = new google.maps.MarkerImage(
-    'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
-    '|40|_|%E2%80%A2',
-    new google.maps.Size(21, 34),
-    new google.maps.Point(0, 0),
-    new google.maps.Point(10, 34),
-    new google.maps.Size(21,34));
-  return markerImage;
-}
-
-
-
-// Style the markers a bit. This will be our listing marker icon.
-var defaultIcon = makeMarkerIcon('0091ff');
-
-
-
-document.getElementById('zoom-to-area').addEventListener('click', zoomToArea );
-
-// Create a "highlighted location" marker color for when the user
-// mouses over the marker.
-var highlightedIcon = makeMarkerIcon('FFFF24');
-
-// This function will loop through the listings and hide them all.
-
-//model array
-
-
-function addLocation(points) {
-  this.itemToAdd = ko.observable("user input");
-  this.addItem = function() {
-      if (this.itemToAdd() != "") {
-          this.items.push(this.itemToAdd(points)); // Adds the item. Writing to the "items" observableArray causes any associated UI to update.
-          this.itemToAdd("");
-        }
-      }
-    }
-
-function removeLocation(points) {
-  this.itemToAdd = ko.observable("user select");
-  this.editItem = function() {
-      if (this.itemToEdit() != "") {
-          this.items.pop(this.itemTo()); // Adds the item. Writing to the "items" observableArray causes any associated UI to update.
-          this.itemToAdd("");
-        }
-      }
-    }
-
-    // This function takes the input value in the find nearby area text input
-    // locates it, and then zooms into that area. This is so that the user can
-    // show all listings, then decide to focus on one area of the map.
-    function zoomToArea() {
-      // Initialize the geocoder.
-      var geocoder = new google.maps.Geocoder();
-      // Get the address or place that the user entered.
-      var address = document.getElementById('zoom-to-area-text').value;
-      // Make sure the address isn't blank.
-      if (address == '') {
-        window.alert('You must enter an area, or address.');
-      } else {
-        // Geocode the address/area entered to get the center. Then, center the map
-        // on it and zoom in
-        geocoder.geocode(
-          { address: address,
-            componentRestrictions: {locality: 'San Diego'}
-          }, function(results, status) {
-            if (status == google.maps.GeocoderStatus.OK) {
-              map.setCenter(results[0].geometry.location);
-              map.setZoom(15);
-            } else {
-              window.alert('We could not find that location - try entering a more' +
-                  ' specific place.');
-            }
-          });
-        }
-      }
-
-
-// Make this a ko view
-
-// Two event listeners - one for mouseover, one for mouseout,
-// to change the colors back and forth.
-// marker.addListener('mouseover', function() {
-//   this.setIcon(highlightedIcon);
-// });
-// marker.addListener('mouseout', function() {
-//   this.setIcon(defaultIcon);
-// });
-function googleMarkers(markers) {
-  var googleMarkers = []
-  for (var i = 0; i < markers().length; i++) {
-    // Get the position from the location array.
-    var position = markers()[i].location;
-    var title = markers()[i].title;
-    // Create a marker per location, and put into markers array.
-    var marker = new google.maps.Marker({
-      map: map,
-      position: position,
-      title: title,
-      draggable: true,
-      animation: google.maps.Animation.DROP,
-      icon: defaultIcon,
-      id: i
-    });
-    marker.addListener('click', function() {
-      populateInfoWindow(this, infoWindow);
-    });
-
-    // Push the marker to our array of markers.
-    googleMarkers.push(marker);
-  }
-
-  return ko.observable(googleMarkers);
-}
-
+//VM that interacts with googleMarkers for filtering in the view
 function viewModel() {
 	 var self = this;
    this.query = ko.observable('');
@@ -185,8 +57,108 @@ function viewModel() {
 
 ko.applyBindings(viewModel);
 
-var infoWindow = new google.maps.InfoWindow();
 
+
+// This function will loop through the markers array and display them all.
+function showMarkers() {
+  var bounds = new google.maps.LatLngBounds();
+  // Extend the boundaries of the map for each marker and display the marker
+  for (var i = 0; i < googleMarkers().length; i++) {
+    var marker = googleMarkers()[i]
+    marker.setMap(map);
+    bounds.extend(marker.position);
+  }
+
+  map.fitBounds(bounds);
+};
+
+//This function will hide all markers on initial list of markers.
+function hideMarkers() {
+  for (var i = 0; i < googleMarkers().length; i++) {
+    var marker = googleMarkers()[i]
+    marker.setMap(null);
+  }
+};
+
+
+
+// This function takes in a COLOR, and then creates a new marker
+// icon of that color. The icon will be 21 px wide by 34 high, have an origin
+// of 0, 0 and be anchored at 10, 34).
+function makeMarkerIcon(markerColor) {
+  var markerImage = new google.maps.MarkerImage(
+    'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+    '|40|_|%E2%80%A2',
+    new google.maps.Size(21, 34),
+    new google.maps.Point(0, 0),
+    new google.maps.Point(10, 34),
+    new google.maps.Size(21,34));
+  return markerImage;
+}
+
+
+// This function takes the input value in the find nearby area text input
+// locates it, and then zooms into that area. This is so that the user can
+// show all listings, then decide to focus on one area of the map.
+function zoomToArea() {
+// Initialize the geocoder.
+var geocoder = new google.maps.Geocoder();
+// Get the address or place that the user entered.
+var address = document.getElementById('zoom-to-area-text').value;
+// Make sure the address isn't blank.
+if (address == '') {
+  window.alert('You must enter an area, or address.');
+} else {
+  // Geocode the address/area entered to get the center. Then, center the map
+  // on it and zoom in
+  geocoder.geocode(
+    { address: address,
+      componentRestrictions: {locality: 'San Diego'}
+    }, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        map.setCenter(results[0].geometry.location);
+        map.setZoom(15);
+      } else {
+        window.alert('We could not find that location - try entering a more' +
+            ' specific place.');
+      }
+    });
+  }
+}
+
+
+// This function will create google markers from the initial set of locations
+function googleMarkers(markers) {
+  var googleMarkers = []
+  for (var i = 0; i < markers().length; i++) {
+    // Get the position from the location array.
+    var position = markers()[i].location;
+    var title = markers()[i].title;
+    // Create a marker per location, and put into markers array.
+    var marker = new google.maps.Marker({
+      map: map,
+      position: position,
+      title: title,
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      icon: defaultIcon,
+      id: i
+    });
+    //add listener for info window function to each marker
+    marker.addListener('click', function() {
+      populateInfoWindow(this, infoWindow);
+    });
+
+    // Push the marker to our array of markers.
+    googleMarkers.push(marker);
+  }
+
+  return ko.observable(googleMarkers);
+}
+
+
+//Function for populating the googleMarkers info windows with
+//Google streetview services
 function populateInfoWindow(marker) {
   console.log(marker.title, 'clicked');
   // Check to make sure the infowindow is not already opened on this marker.
@@ -229,7 +201,7 @@ function populateInfoWindow(marker) {
       infoWindow.addListener('closeclick', function() {
       infoWindow.marker = null;
     });
-
+  //Animate markers with a 750ms bounce
   if (marker.getAnimation() !== null) {
     marker.setAnimation(null);
   }
@@ -253,11 +225,11 @@ var key = '&client_id=' + client_id + '&client_secret=' + client_secret + '&v=' 
 var url = base_url+endpoint+params+key;
 
 $.get(url, function (result) {
-    //$('#msg pre').text(JSON.stringify(url));
+    //Get string representation of location info
     $('#msg pre').text(JSON.stringify(result));
 
     var venues = result.response.venues;
-    //printVenues(venues);
+
     for (var i in venues){
         var venue = venues[i];
         // place the a marker on the map
@@ -276,6 +248,7 @@ $.get(url, function (result) {
         });
     }});
 
+//Create info windows for Four Sqaure markers
 function fourSquareInfoWindow(marker) {
     console.log(marker.title, 'clicked');
     infoWindow.marker = marker;
@@ -297,7 +270,8 @@ function fourSquareInfoWindow(marker) {
     infoWindow.open(map, marker);
 
   }
-
+  
+//Error handling function for google maps
 function mapErrorAlert() {
     $('#map').html("<p>An error occoured loading Google Maps. Please try again.</p>");
 }
