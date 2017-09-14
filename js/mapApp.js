@@ -5,9 +5,6 @@ var markers = [];
 // Style the markers a bit.
 var defaultIcon = makeMarkerIcon('0091ff');
 
-//Listener for area zoom function
-document.getElementById('zoom-to-area').addEventListener('click', zoomToArea );
-
 // Create a "highlighted location" marker color for when the user
 // mouses over the marker.
 var highlightedIcon = makeMarkerIcon('FFFF24');
@@ -270,7 +267,7 @@ function fourSquareInfoWindow(marker) {
     infoWindow.open(map, marker);
 
   }
-  
+
 //Error handling function for google maps
 function mapErrorAlert() {
     $('#map').html("<p>An error occoured loading Google Maps. Please try again.</p>");
