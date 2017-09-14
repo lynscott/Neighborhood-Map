@@ -262,7 +262,7 @@ function fourSquareInfoWindow(marker) {
     if (marker.stats) {
       innerHTML += '<br>' + marker.stats + ' Checkins';
     }
-    innerHTML += '</div>';
+    innerHTML += '<br>' + 'Powered by FourSqaure' + '</div>';
     infoWindow.setContent(innerHTML);
     infoWindow.open(map, marker);
 
