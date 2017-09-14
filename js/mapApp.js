@@ -1,12 +1,3 @@
-// Start View
-//Knockout must be used to handle the list, filter, and any other information on
-//the page that is subject to changing state. Things that should not be handled
-// by Knockout: anything the Maps API is used for, creating markers, tracking
-//click events on markers, making the map, refreshing the map. Note 1: Tracking
-//click events on list items should be handled with Knockout. Note 2: Creating
-//your markers as a part of your ViewModel is allowed (and recommended).
-//Creating them as Knockout observables is not.
-// Create a new blank array for all the listing markers.
 
 var markers = [];
 
@@ -251,6 +242,61 @@ function populateInfoWindow(marker) {
 }
 
 
+//Foursquare api
+var client_id = 'KRW4HUBE2V5BW4AFX2DQROVVAMLM3KQBONFFH0SRWBF4X2OX';
+var client_secret = 'TK0JPEMFRNDXPCP4JKHWURAQILX2EQUVAEWWXQXCRMXDKE3V';
+var base_url = 'https://api.foursquare.com/v2/';
+var endpoint = 'venues/search?';
+
+var params = 'near=San+Diego+State+University';
+var key = '&client_id=' + client_id + '&client_secret=' + client_secret + '&v=' + '20170101';
+var url = base_url+endpoint+params+key;
+
+$.get(url, function (result) {
+    //$('#msg pre').text(JSON.stringify(url));
+    $('#msg pre').text(JSON.stringify(result));
+
+    var venues = result.response.venues;
+    //printVenues(venues);
+    for (var i in venues){
+        var venue = venues[i];
+        // place the a marker on the map
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(venue.location.lat,venue.location.lng),
+          map: map,
+          animation: google.maps.Animation.DROP,
+          title: venue.name,
+          marker_id: venue.id,
+          address: venue.location.formattedAddress,
+          stats: venue.stats.checkinsCount,
+          category: venue.categories.shortName
+        });
+        marker.addListener('click', function() {
+          fourSquareInfoWindow(this, infoWindow);
+        });
+    }});
+
+function fourSquareInfoWindow(marker) {
+    console.log(marker.title, 'clicked');
+    infoWindow.marker = marker;
+    var innerHTML = '<div>';
+    if (marker.title) {
+      innerHTML += '<strong>' + marker.title + '</strong>';
+    }
+    if (marker.address) {
+      innerHTML += '<br>' + marker.address;
+    }
+    if (marker.category) {
+      innerHTML += '<br>' + 'Category:' + marker.category;
+    }
+    if (marker.stats) {
+      innerHTML += '<br>' + marker.stats + ' Checkins';
+    }
+    innerHTML += '</div>';
+    infoWindow.setContent(innerHTML);
+    infoWindow.open(map, marker);
+
+  }
 
 function mapErrorAlert() {
     $('#map').html("<p>An error occoured loading Google Maps. Please try again.</p>");
