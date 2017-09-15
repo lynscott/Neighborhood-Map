@@ -126,6 +126,9 @@ if (address === '') {
 
 // This function will create google markers from the initial set of locations
 function googleMarkers(markers) {
+  var startWindow = function() {
+    populateInfoWindow(this, infoWindow);
+  };
   var googleMarkers = [];
   for (var i = 0; i < markers().length; i++) {
     // Get the position from the location array.
@@ -143,9 +146,7 @@ function googleMarkers(markers) {
     });
 
     //Populate info window and attach listener to each marker
-    marker.addListener('click', function() {
-      populateInfoWindow(this, infoWindow);
-    });
+    marker.addListener('click', startWindow );
     // Push the marker to our array of markers.
     googleMarkers.push(marker);
   }
@@ -187,7 +188,7 @@ function populateInfoWindow(marker) {
            infoWindow.setContent('<div>' + marker.title + '</div>' +
              '<div>No Street View Found</div>');
          }
-       }
+       };
        // Use streetview service to get the closest streetview image within
        // 50 meters of the markers position
        streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
@@ -226,6 +227,9 @@ $.get(url, function (result) {
     $('#msg pre').text(JSON.stringify(result));
 
     var venues = result.response.venues;
+    var startSqaureWindow = function() {
+      fourSquareInfoWindow(this, infoWindow);
+    };
 
     for (var i in venues){
         var venue = venues[i];
@@ -238,11 +242,9 @@ $.get(url, function (result) {
           marker_id: venue.id,
           address: venue.location.formattedAddress,
           stats: venue.stats.checkinsCount,
-          category: venue.categories.shortName
+          category: venue.categories.name
         });
-        marker.addListener('click', function() {
-          fourSquareInfoWindow(this, infoWindow);
-        });
+        marker.addListener('click', startSqaureWindow );
     }});
 
 //Create info windows for Four Sqaure markers
