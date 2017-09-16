@@ -1,5 +1,16 @@
 //Google maps api
 
+//Init map
+var map;
+function initMap() {
+  // Constructor creates a new map - only center and zoom are required.
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: {lat: 32.750873, lng: -117.099478},
+    zoom: 13
+    });
+  }
+
+
 var markers = [];
 
 // Style the markers a bit.
@@ -10,6 +21,8 @@ var defaultIcon = makeMarkerIcon('0091ff');
 var highlightedIcon = makeMarkerIcon('FFFF24');
 
 var infoWindow = new google.maps.InfoWindow();
+
+
 
 //Model for static data points
 function markerViewModel() {
@@ -39,7 +52,7 @@ function viewModel() {
    this.markers = new markerViewModel();
    this.googleMarkers = new googleMarkers(this.markers);
 
-   this.markersFilter = ko.dependentObservable(function() {
+   this.markersFilter = ko.computed(function() {
        var search = self.query().toLowerCase();
        var filter =  ko.utils.arrayFilter(self.googleMarkers(), function(marker) {
           if (marker.title.toLowerCase().indexOf(search) >= 0) {
