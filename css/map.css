@@ -67,10 +67,10 @@ h1 {
   margin-left: 10px;
 }
 
-/*#zoom-to-area-text {
-  width: 50%;
+#zoom-to-area-text {
+  width: 100%;
 }
 
 #zoom-to-area {
-  width: 20%;
-}*/
+  width: 90%;
+}

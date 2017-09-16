@@ -3,14 +3,17 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
-    <title></title>
+    <title>Neighborhood Map</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
     integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="css/map.css">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
   </head>
 <body>
+
   <div class="container-fluid">
+    <div class="aside">
+
+
       <div class="options-box">
         <h1>My Neighborhood Map</h1>
         <div>
@@ -44,26 +47,19 @@
           </span>
       </div>
     </div>
-     </div>
+    </div>
+   </div>
   </div>
 
 
-  <div id="map"></div>
-  <script>
-  var map;
-  function initMap() {
-    // Constructor creates a new map - only center and zoom are required.
-    map = new google.maps.Map(document.getElementById("map"), {
-      center: {lat: 32.750873, lng: -117.099478},
-      zoom: 13
-      });
-    }
-  </script>
-  <script async defer
-        src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyBTZYzfTbP3yeBifwXQZm9VR9p5okWxyP4&v=3&callback=initMap" async defer onerror="mapErrorAlert()">
-  </script>
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <div class="main" id="map"></div>
 
-   <script async type="text/javascript" src="js/mapApp.js"></script>
+
+   <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+   <script src="js/mapApp.js"></script>
+   <script async defer
+         src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyBTZYzfTbP3yeBifwXQZm9VR9p5okWxyP4&v=3&callback=initMap" async defer onerror="mapErrorAlert()">
+   </script>
 </body>
 </html>
