@@ -41,7 +41,7 @@ function markerViewModel() {
 
 
 //VM that interacts with googleMarkers for filtering in the view
-function viewModel() {
+function FilterViewModel() {
 	 var self = this;
    this.query = ko.observable('');
    this.resetMap = function() {
@@ -56,6 +56,7 @@ function viewModel() {
        var search = self.query().toLowerCase();
        var filter =  ko.utils.arrayFilter(self.googleMarkers(), function(marker) {
           if (marker.title.toLowerCase().indexOf(search) >= 0) {
+            marker.setVisible(true)
             return marker;
           }
 
@@ -75,7 +76,8 @@ function showMarkers() {
   // Extend the boundaries of the map for each marker and display the marker
   for (var i = 0; i < googleMarkers().length; i++) {
     var marker = googleMarkers()[i];
-    marker.setMap(map);
+    marker.setVisible(true)
+    // marker.setMap(map);
     bounds.extend(marker.position);
   }
 
