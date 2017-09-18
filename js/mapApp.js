@@ -7,7 +7,7 @@ var locations = [
   { title: 'SDSU', location: { lat: 32.775722, lng: -117.071889 } }
 ];
 
-function loadScript(src,callback){
+function loadGoogle(src,callback){
 
 var script = document.createElement("script");
 script.type = "text/javascript";
@@ -17,8 +17,8 @@ script.src = src;
 }
 
 
-loadScript('https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyBTZYzfTbP3yeBifwXQZm9VR9p5okWxyP4&v=3&callback=initMap',
-          console.log('google-loader has been loaded, but not the maps-API '));
+loadGoogle('https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyBTZYzfTbP3yeBifwXQZm9VR9p5okWxyP4&v=3&callback=initMap',
+          console.log('google has been loaded, but not the maps-API '));
 
 
 function initMap() {
@@ -30,11 +30,10 @@ function initMap() {
   };
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
   googleMarkers(locations);
-
   infoWindow = new google.maps.InfoWindow();
 }
 
-var Markers =ko.observableArray();
+var Markers = ko.observableArray();
 
 //VM that interacts with googleMarkers for filtering in the view
 function ViewModel() {
@@ -52,7 +51,10 @@ function ViewModel() {
     var search = self.query().toLowerCase();
     var filter = ko.utils.arrayFilter(this.markers, function (marker) {
       if (marker.title.toLowerCase().indexOf(search) >= 0) {
-        return marker;
+        marker.setVisible(true);
+        return marker
+      }else {
+        return marker.setVisible(false);
       }
 
     }, this);
@@ -69,10 +71,9 @@ ko.applyBindings(ViewModel);
 function showMarkers() {
   var bounds = new google.maps.LatLngBounds();
   // Extend the boundaries of the map for each marker and display the marker
-  for (var i = 0; i < googleMarkers().length; i++) {
-    var marker = googleMarkers()[i];
-    marker.setMap(map);
-    bounds.extend(marker.position);
+  for (var i = 0; i < Markers().length; i++) {
+    Markers()[i].setVisible(true);
+    bounds.extend(Markers()[i].position);
   }
 
   map.fitBounds(bounds);
@@ -80,8 +81,8 @@ function showMarkers() {
 
 //This function will hide all markers on initial list of markers.
 function hideMarkers() {
-  for (var i = 0; i < googleMarkers().length; i++) {
-    var marker = googleMarkers()[i];
+  for (var i = 0; i < Markers().length; i++) {
+    Markers()[i].setVisible(false);
     marker.setMap(null);
   }
 }
@@ -160,7 +161,7 @@ function googleMarkers(markers) {
     // Push the marker to our array of markers.
     Markers.push(marker);
   }
-  
+
 }
 
 
