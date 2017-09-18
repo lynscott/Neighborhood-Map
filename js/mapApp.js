@@ -1,42 +1,43 @@
-//Google maps api
+//Load Google maps api
+var locations = [
+  { title: 'City Heights Library', location: { lat: 32.747508, lng: -117.100578 } },
+  { title: 'Chipotle', location: { lat: 32.749411, lng: -117.099595 } },
+  { title: 'YMCA', location: { lat: 32.755718, lng: -117.10135 } },
+  { title: 'Rock Church', location: { lat: 32.754767, lng: -117.107842 } },
+  { title: 'SDSU', location: { lat: 32.775722, lng: -117.071889 } }
+];
+
+function loadScript(src,callback){
+
+var script = document.createElement("script");
+script.type = "text/javascript";
+if(callback)script.onload=callback;
+document.getElementsByTagName("body")[0].appendChild(script);
+script.src = src;
+}
+
+
+loadScript('https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyBTZYzfTbP3yeBifwXQZm9VR9p5okWxyP4&v=3&callback=initMap',
+          console.log('google-loader has been loaded, but not the maps-API '));
+
 
 function initMap() {
-  // Constructor creates a new map - only center and zoom are required.
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: {lat: 32.750873, lng: -117.099478},
-    zoom: 13
-    });
+
+  console.log('maps-API has been loaded, ready to use');
+  var mapOptions = {
+        zoom: 13,
+        center: new google.maps.LatLng(32.750873, -117.099478)
+  };
+  map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  googleMarkers(locations);
 
   infoWindow = new google.maps.InfoWindow();
-
-  ko.applyBindings(new ViewModel());
-
 }
 
-var markers = [];
-
-
-
-//Model for static data points
-function markerViewModel() {
-  // model info
-  var locations = [
-    { title: 'City Heights Library', location: { lat: 32.747508, lng: -117.100578 } },
-    { title: 'Chipotle', location: { lat: 32.749411, lng: -117.099595 } },
-    { title: 'YMCA', location: { lat: 32.755718, lng: -117.10135 } },
-    { title: 'Rock Church', location: { lat: 32.754767, lng: -117.107842 } },
-    { title: 'SDSU', location: { lat: 32.775722, lng: -117.071889 } }
-  ];
-
-  return ko.observable(locations);
-
-}
-
+var Markers =ko.observableArray();
 
 //VM that interacts with googleMarkers for filtering in the view
 function ViewModel() {
-  var infoWindow = new google.maps.InfoWindow();
-
   var self = this;
   this.query = ko.observable('');
   this.resetMap = function () {
@@ -44,12 +45,12 @@ function ViewModel() {
     map.setCenter(mapData.center);
   };
 
-  this.markers = new markerViewModel();
-  this.googleMarkers = new googleMarkers(this.markers);
+  this.markers = Markers();
+  // this.googleMarkers = new googleMarkers(this.markers);
 
   this.markersFilter = ko.computed(function () {
     var search = self.query().toLowerCase();
-    var filter = ko.utils.arrayFilter(self.googleMarkers(), function (marker) {
+    var filter = ko.utils.arrayFilter(this.markers, function (marker) {
       if (marker.title.toLowerCase().indexOf(search) >= 0) {
         return marker;
       }
@@ -58,39 +59,11 @@ function ViewModel() {
 
     return filter;
   });
-
-// This function will create google markers from the initial set of locations
-function googleMarkers(markers) {
-  var startWindow = function () {
-    populateInfoWindow(this, infoWindow);
-  };
-  var googleMarkers = [];
-  for (var i = 0; i < markers().length; i++) {
-    // Get the position from the location array.
-    var position = markers()[i].location;
-    var title = markers()[i].title;
-    // Create a marker per location, and put into markers array.
-    var marker = new google.maps.Marker({
-      map: map,
-      position: position,
-      title: title,
-      draggable: true,
-      animation: google.maps.Animation.DROP,
-      icon: defaultIcon,
-      id: i
-    });
-
-    //Populate info window and attach listener to each marker
-    marker.addListener('click', startWindow);
-    // Push the marker to our array of markers.
-    googleMarkers.push(marker);
-  }
-
-  return ko.observable(googleMarkers);
 }
 
-// Style the markers a bit.
-var defaultIcon = makeMarkerIcon('0091ff');
+ko.applyBindings(ViewModel);
+
+
 
 // This function will loop through the markers array and display them all.
 function showMarkers() {
@@ -105,7 +78,6 @@ function showMarkers() {
   map.fitBounds(bounds);
 }
 
-
 //This function will hide all markers on initial list of markers.
 function hideMarkers() {
   for (var i = 0; i < googleMarkers().length; i++) {
@@ -114,27 +86,21 @@ function hideMarkers() {
   }
 }
 
-  // This function takes in a COLOR, and then creates a new marker
-  // icon of that color. The icon will be 21 px wide by 34 high, have an origin
-  // of 0, 0 and be anchored at 10, 34).
-  function makeMarkerIcon(markerColor) {
-    var markerImage = new google.maps.MarkerImage(
-      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
-      '|40|_|%E2%80%A2',
-      new google.maps.Size(21, 34),
-      new google.maps.Point(0, 0),
-      new google.maps.Point(10, 34),
-      new google.maps.Size(21, 34));
-    return markerImage;
-  }
 
 
+// This function takes in a COLOR, and then creates a new marker
+// icon of that color. The icon will be 21 px wide by 34 high, have an origin
+// of 0, 0 and be anchored at 10, 34).
+function makeMarkerIcon(markerColor) {
+  var markerImage = new google.maps.MarkerImage(
+    'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+    '|40|_|%E2%80%A2',
+    new google.maps.Size(21, 34),
+    new google.maps.Point(0, 0),
+    new google.maps.Point(10, 34),
+    new google.maps.Size(21, 34));
+  return markerImage;
 }
-
-ko.applyBindings(ViewModel);
-
-
-
 
 
 // This function takes the input value in the find nearby area text input
@@ -167,6 +133,35 @@ function zoomToArea() {
   }
 }
 
+
+// This function will create google markers from the initial set of locations
+function googleMarkers(markers) {
+  var startWindow = function () {
+    populateInfoWindow(this, infoWindow);
+  };
+  // Markers = ko.observableArray();
+  for (var i = 0; i < markers.length; i++) {
+    // Get the position from the location array.
+    var position = markers[i].location;
+    var title = markers[i].title;
+    // Create a marker per location, and put into markers array.
+    var marker = new google.maps.Marker({
+      map: map,
+      position: position,
+      title: title,
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      icon: makeMarkerIcon('0091ff'),
+      id: i
+    });
+
+    //Populate info window and attach listener to each marker
+    marker.addListener('click', startWindow);
+    // Push the marker to our array of markers.
+    Markers.push(marker);
+  }
+  
+}
 
 
 
