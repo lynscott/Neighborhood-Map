@@ -30,8 +30,8 @@
           </div>
         </div>
 
-        <button id="show-markers" type="button" class="btn btn-primary" data-bind="click: showMarkers" name="button">Show Markers</button>
-        <button id="hide-markers" type="button" class="btn btn-default" data-bind="click: hideMarkers" name="button">Hide Markers</button>
+        <button id="show-markers" type="button" class="btn btn-primary" data-bind="click: ViewModel.showMarkers" name="button">Show Markers</button>
+        <button id="hide-markers" type="button" class="btn btn-default" data-bind="click: ViewModel.hideMarkers" name="button">Hide Markers</button>
 
       </div>
 
@@ -41,7 +41,7 @@
     <div class="row">
     <div class="col-xs-3">
       <div class="input-group">
-        <input id="zoom-to-area-text" type="text" class="form-control" placeholder="Input Area">
+        <input id="zoom-to-area-text" type="text" class="form-control" data-bind="address" placeholder="Input Area">
           <span class="input-group-btn">
             <button id="zoom-to-area" class="btn btn-default" data-bind="click: zoomToArea" type="button" name="buttton">Go!</button>
           </span>
