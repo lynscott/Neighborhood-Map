@@ -33,7 +33,10 @@ function initMap() {
   infoWindow = new google.maps.InfoWindow();
 }
 
+
 var Markers = ko.observableArray();
+
+
 
 //VM that interacts with googleMarkers for filtering in the view
 function FilterModel() {
@@ -85,7 +88,6 @@ function showMarkers() {
 function hideMarkers() {
   for (var i = 0; i < Markers().length; i++) {
     Markers()[i].setVisible(false);
-    marker.setMap(null);
   }
 }
 
@@ -225,41 +227,73 @@ function populateInfoWindow(marker) {
 }
 
 
+
+
 //Foursquare api
+var Venue = function(result) {
+    this.id = result.venue.id;
+    this.name = result.venue.name;
+    this.phone = result.venue.contact.formattedPhone || "n/a";
+    this.lat = result.venue.location.lat;
+    this.lng = result.venue.location.lng;
+    this.location = [this.lat ,this.lng]
+    this.rating = result.venue.rating || "n/a";
+    this.website = result.venue.url;
+    this.checkins = result.venue.stats.checkinsCount
+    this.category = result.venue.categories[0].name;
+    this.formattedAddress = result.venue.location.formattedAddress;
+};
+
+
 var client_id = 'KRW4HUBE2V5BW4AFX2DQROVVAMLM3KQBONFFH0SRWBF4X2OX';
 var client_secret = 'TK0JPEMFRNDXPCP4JKHWURAQILX2EQUVAEWWXQXCRMXDKE3V';
-var base_url = 'https://api.foursquare.com/v2/';
-var endpoint = 'venues/search?';
+var base_url = 'https://api.foursquare.com/v2/venues/explore';
+var endpoint = '';
 
+var version = "20170101"; // API version
+var section = "topPicks"; // topPicks - grabs most popular spots based on location
+var limit = "15"; // limit to 15 venues
 var params = 'near=San+Diego+State+University';
-var key = '&client_id=' + client_id + '&client_secret=' + client_secret + '&v=' + '20170101';
-var url = base_url + endpoint + params + key;
+// var key = '&client_id=' + client_id + '&client_secret=' + client_secret + '&v=' + '20170101';
+// var url = base_url + endpoint + params + key;
 
-$.get(url, function (result) {
-  //Get string representation of location info
-  $('#msg pre').text(JSON.stringify(result));
+ var url = base_url + '?client_id=' + client_id + '&client_secret=' + client_secret + '&ll=' + 32.750873 + ',' + -117.099478 + '&v=' + version + '&section=' + section + '&limit' + limit;
 
-  var venues = result.response.venues;
+$.getJSON(url)
+  .done(function(result) {
+  var venues = result.response.groups[0].items;
   var startSqaureWindow = function () {
     fourSquareInfoWindow(this, infoWindow);
   };
 
-  for (var i in venues) {
-    var venue = venues[i];
-    // place the a marker on the map
+  self.venueArray = ko.observableArray([])
+
+  venues.forEach(function(result) {
+    self.venueArray.push(new Venue(result));
+  });
+
+  for (var i = 0; i < venueArray().length; i++) {
+    // Get the position from the location array.
+    var position = new google.maps.LatLng(venueArray()[i].lat,venueArray()[i].lng)
+    var title = venueArray()[i].name;
     marker = new google.maps.Marker({
-      position: new google.maps.LatLng(venue.location.lat, venue.location.lng),
+      position: position,
       map: map,
       animation: google.maps.Animation.DROP,
-      title: venue.name,
-      marker_id: venue.id,
-      address: venue.location.formattedAddress,
-      stats: venue.stats.checkinsCount,
-      category: venue.categories.name
+      title: title,
+      marker_id: venueArray()[i].id,
+      address: venueArray()[i].formattedAddress,
+      stats: venueArray()[i].checkins,
+      rating: venueArray()[i].rating,
+      category: venueArray()[i].category
     });
     marker.addListener('click', startSqaureWindow);
+    Markers.push(marker);
   }
-});
+}).fail(function() {
+                // error loading API data
+                self.errorFound(true);
+                });
 
 //Create info windows for Four Sqaure markers
 function fourSquareInfoWindow(marker) {
@@ -282,9 +316,41 @@ function fourSquareInfoWindow(marker) {
   infoWindow.setContent(innerHTML);
   infoWindow.open(map, marker);
 
+  if (marker.getAnimation() !== null) {
+    marker.setAnimation(null);
+  }
+  else {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function () {
+      marker.setAnimation(null);
+    }, 750);
+  }
+
 }
 
 //Error handling function for google maps
 function mapErrorAlert() {
   $('#map').html("<p>An error occoured loading Google Maps. Please try again.</p>");
 }
+
+function clickNav() {
+  toggle = !this.visibleNav;
+  this.visibleNav = ko.observable(false);
+
+}
+// (() => {
+//   'use strict';
+//
+//   class ViewModel {
+//     constructor() {
+//       this.visibleNav = ko.observable(true);
+//     }
+//
+//     clickNav() {
+//         this.visibleNav(!this.visibleNav());
+//     }
+//   } //.ViewModel
+
+//   var viewModel = new ViewModel();
+//   ko.applyBindings(viewModel);
+// })();
