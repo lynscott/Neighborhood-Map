@@ -1,5 +1,5 @@
 //Load Google maps api
-var locations = [
+locations = [
   { title: 'City Heights Library', location: { lat: 32.747508, lng: -117.100578 } },
   { title: 'Chipotle', location: { lat: 32.749411, lng: -117.099595 } },
   { title: 'YMCA', location: { lat: 32.755718, lng: -117.10135 } },
@@ -29,13 +29,55 @@ function initMap() {
         center: new google.maps.LatLng(32.750873, -117.099478)
   };
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  googleMarkers(locations);
+  setMainMarkers();
+  // googleMarkers();
   infoWindow = new google.maps.InfoWindow();
 }
 
 
+myPlaces = ko.observableArray([]);
 var Markers = ko.observableArray();
 
+
+
+
+
+function setMainMarkers() {
+  var client_id = 'KRW4HUBE2V5BW4AFX2DQROVVAMLM3KQBONFFH0SRWBF4X2OX';
+  var client_secret = 'TK0JPEMFRNDXPCP4JKHWURAQILX2EQUVAEWWXQXCRMXDKE3V';
+  var base_url = 'https://api.foursquare.com/v2/venues/search';
+  var endpoint = '';
+  var limit = 1
+  var version = "20170101"
+
+
+
+  var Place = function(place) {
+      this.id = place.id;
+      this.name = place.name;
+      this.phone = place.formattedPhone || "n/a";
+      this.lat = place.location.lat;
+      this.lng = place.location.lng;
+    }
+
+  self.myArray = ko.observableArray([]);
+
+
+
+  for (var i = 0; i < locations.length; i++) {
+      console.log(i);
+      var myUrl = base_url + '?client_id=' + client_id + '&client_secret=' + client_secret + '&ll=' + locations[i].location.lat + ',' + locations[i].location.lng +  '&limit=' + limit + '&v=' + version;
+      $.getJSON(myUrl)
+      .done(function(result) {
+      var place = result.response.venues;
+      console.log(place);
+      place.forEach(function(place) {
+        myPlaces.push(new Place(place));
+        console.log(myPlaces())
+      });
+    });
+  }setTimeout( function() {googleMarkers();},1000);
+}
 
 
 //VM that interacts with googleMarkers for filtering in the view
@@ -68,6 +110,34 @@ function FilterModel() {
 
 ko.applyBindings(FilterModel);
 
+// This function will create google markers from the initial set of locations
+function googleMarkers() {
+  var startWindow = function () {
+    populateInfoWindow(this, infoWindow);
+  };
+  // Markers = ko.observableArray();
+  for (var i = 0; i < myPlaces().length; i++) {
+    // Get the position from the location array.
+    var position = new google.maps.LatLng(myPlaces()[i].lat,myPlaces()[i].lng)
+    var title = myPlaces()[i].name;
+    // Create a marker per location, and put into markers array.
+    var marker = new google.maps.Marker({
+      map: map,
+      position: position,
+      title: title,
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      icon: makeMarkerIcon('0091ff'),
+      id: myPlaces()[i].id
+    });
+
+    //Populate info window and attach listener to each marker
+    marker.addListener('click', startWindow);
+    // Push the marker to our array of markers.
+    Markers.push(marker);
+  }
+
+}
 
 
 // This function will loop through the markers array and display them all.
@@ -139,34 +209,7 @@ function zoomToArea() {
 }
 
 
-// This function will create google markers from the initial set of locations
-function googleMarkers(markers) {
-  var startWindow = function () {
-    populateInfoWindow(this, infoWindow);
-  };
-  // Markers = ko.observableArray();
-  for (var i = 0; i < markers.length; i++) {
-    // Get the position from the location array.
-    var position = markers[i].location;
-    var title = markers[i].title;
-    // Create a marker per location, and put into markers array.
-    var marker = new google.maps.Marker({
-      map: map,
-      position: position,
-      title: title,
-      draggable: true,
-      animation: google.maps.Animation.DROP,
-      icon: makeMarkerIcon('0091ff'),
-      id: i
-    });
 
-    //Populate info window and attach listener to each marker
-    marker.addListener('click', startWindow);
-    // Push the marker to our array of markers.
-    Markers.push(marker);
-  }
-
-}
 
 
 
@@ -222,7 +265,7 @@ function populateInfoWindow(marker) {
     marker.setAnimation(google.maps.Animation.BOUNCE);
     setTimeout(function () {
       marker.setAnimation(null);
-    }, 750);
+    }, 1400);
   }
 }
 
@@ -236,7 +279,6 @@ var Venue = function(result) {
     this.phone = result.venue.contact.formattedPhone || "n/a";
     this.lat = result.venue.location.lat;
     this.lng = result.venue.location.lng;
-    this.location = [this.lat ,this.lng]
     this.rating = result.venue.rating || "n/a";
     this.website = result.venue.url;
     this.checkins = result.venue.stats.checkinsCount
@@ -253,7 +295,6 @@ var endpoint = '';
 var version = "20170101"; // API version
 var section = "topPicks"; // topPicks - grabs most popular spots based on location
 var limit = "15"; // limit to 15 venues
-var params = 'near=San+Diego+State+University';
 // var key = '&client_id=' + client_id + '&client_secret=' + client_secret + '&v=' + '20170101';
 // var url = base_url + endpoint + params + key;
 
@@ -292,7 +333,7 @@ $.getJSON(url)
   }
 }).fail(function() {
                 // error loading API data
-                self.errorFound(true);
+                self.mapErrorAlert();
                 });
 
 //Create info windows for Four Sqaure markers
