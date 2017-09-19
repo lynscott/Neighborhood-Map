@@ -380,23 +380,9 @@ function mapErrorAlert() {
 }
 
 function clickNav() {
-  toggle = !this.visibleNav;
-  this.visibleNav = ko.observable(false);
-
+  var nav = document.getElementById('Nav');
+  if(nav.style.display == 'block')
+      nav.style.display = 'none';
+  else
+      nav.style.display = 'block';
 }
-// (() => {
-//   'use strict';
-//
-//   class ViewModel {
-//     constructor() {
-//       this.visibleNav = ko.observable(true);
-//     }
-//
-//     clickNav() {
-//         this.visibleNav(!this.visibleNav());
-//     }
-//   } //.ViewModel
-
-//   var viewModel = new ViewModel();
-//   ko.applyBindings(viewModel);
-// })();

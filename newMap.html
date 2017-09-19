@@ -10,13 +10,15 @@
   </head>
   <nav>
     <ul class="nav nav-pills">
-      <!-- <button role="presentation" type="button" data-bind="click: clickNav.toggle" class="active">Navigation</button> -->
+      <button id="nav-toggle" role="presentation" type="button" data-bind="click: clickNav" class="btn btn-primary">Navigation</button>
     </ul>
   </nav>
 <body>
 
-  <div class="container-fluid">
-    <div class="aside">
+<div class="container-fluid">
+
+
+    <aside id="Nav">
 
 
       <div class="options-box">
@@ -38,26 +40,31 @@
         <button id="show-markers" type="button" class="btn btn-primary" data-bind="click: showMarkers" name="button">Show Markers</button>
         <button id="hide-markers" type="button" class="btn btn-default" data-bind="click: hideMarkers" name="button">Hide Markers</button>
 
+        <div class="row">
+        <div class="col-xs-3">
+          <div class="input-group">
+            <input id="zoom-to-area-text" type="text" class="form-control" data-bind="textInput: zoomToArea.inputAddress" placeholder="Input Area">
+              <span class="input-group-btn">
+                <button id="zoom-to-area" class="btn btn-default" data-bind="click: zoomToArea" type="button" name="buttton">Go!</button>
+              </span>
+          </div>
+        </div>
+        </div>
+
       </div>
 
-      <!-- <div class = "options-box">
-        <input id="zoom-to-area-text" type="text" class="form-control" placeholder="Insert Area">
-        <button  type="button" class="btn btn-default" name="button">Go</button> -->
-    <div class="row">
-    <div class="col-xs-3">
-      <div class="input-group">
-        <input id="zoom-to-area-text" type="text" class="form-control" data-bind="textInput: zoomToArea.inputAddress" placeholder="Input Area">
-          <span class="input-group-btn">
-            <button id="zoom-to-area" class="btn btn-default" data-bind="click: zoomToArea" type="button" name="buttton">Go!</button>
-          </span>
-      </div>
-    </div>
-    </div>
-   </div>
-  </div>
 
 
-  <div class="main" id="map"></div>
+   </aside>
+
+
+
+   <main id="map"></main>
+ </div>
+
+
+
+
 
 
    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>

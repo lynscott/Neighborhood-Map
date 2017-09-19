@@ -1,5 +1,7 @@
 html,
-body {
+body,
+main
+ {
   font-family: Arial, sans-serif;
   height: 100%;
   margin: 0;
@@ -8,8 +10,11 @@ body {
 
 .container {
   height: 100%;
-  position: relative;
-  margin-left: inherit;
+  width: 100%;
+}
+
+.nav {
+  padding-left: 43%;
 }
 
 input {
@@ -32,19 +37,26 @@ h1 {
 #map {
   bottom:0px;
   height: 100%;
-  left: 362px;
-  position: absolute;
-  right: 0px;
+  width: 100%
 }
 
+main {
+  width: 100%;
+  position: absolute;
+  right: 0px;
+  z-index: 1;
+}
+
+aside {
+  position: absolute;
+  z-index: 2;
+  left: 75%;
+}
 
 .options-box {
   background: #fff;
-  height: 100%;
-  line-height: 35px;
-  padding: 10px 10px 10px 10px;
+
   text-align: left;
-  width: 340px;
 }
 
 #pano {
@@ -58,11 +70,15 @@ h1 {
   font-size: 12px;
 }
 
+#nav-toggle {
+  z-index: 3;
+  position: absolute;
+}
 
 #zoom-to-area-text {
-  width: 100%;
+  /*width: 100%;*/
 }
 
 #zoom-to-area {
-  width: 90%;
+  /*width: 90%;*/
 }
