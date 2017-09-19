@@ -36,7 +36,7 @@ function initMap() {
 var Markers = ko.observableArray();
 
 //VM that interacts with googleMarkers for filtering in the view
-function ViewModel() {
+function FilterModel() {
   var self = this;
   this.query = ko.observable('');
   this.resetMap = function () {
@@ -63,7 +63,7 @@ function ViewModel() {
   });
 }
 
-ko.applyBindings(ViewModel);
+ko.applyBindings(FilterModel);
 
 
 
@@ -76,7 +76,9 @@ function showMarkers() {
     bounds.extend(Markers()[i].position);
   }
 
-  map.fitBounds(bounds);
+  google.maps.event.addDomListener(window, 'resize', function() {
+  map.fitBounds(bounds); // `bounds` is a `LatLngBounds` object
+});
 }
 
 //This function will hide all markers on initial list of markers.
@@ -109,18 +111,18 @@ function makeMarkerIcon(markerColor) {
 // show all listings, then decide to focus on one area of the map.
 function zoomToArea() {
   // Initialize the geocoder.
-  var geocoder = new google.maps.Geocoder();
+  geocoder = new google.maps.Geocoder();
   // Get the address or place that the user entered.
-  var address = document.getElementById('zoom-to-area-text').value;
+  inputAddress = ko.observable();
   // Make sure the address isn't blank.
-  if (address === '') {
+  if (inputAddress === '') {
     window.alert('You must enter an area, or address.');
   } else {
     // Geocode the address/area entered to get the center. Then, center the map
     // on it and zoom in
     geocoder.geocode(
       {
-        address: address,
+        address: 'inputAddress',
         componentRestrictions: { locality: 'San Diego' }
       }, function (results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
