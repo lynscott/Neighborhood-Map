@@ -14,6 +14,7 @@ script.type = "text/javascript";
 if(callback)script.onload=callback;
 document.getElementsByTagName("body")[0].appendChild(script);
 script.src = src;
+self.onerror = mapErrorAlert();
 }
 
 
@@ -55,6 +56,7 @@ function setMainMarkers() {
   var Place = function(place) {
       this.id = place.id;
       this.name = place.name;
+      this.category = place.categories[0].name;
       this.phone = place.formattedPhone || "n/a";
       this.lat = place.location.lat;
       this.lng = place.location.lng;
@@ -67,6 +69,7 @@ function setMainMarkers() {
   for (var i = 0; i < locations.length; i++) {
       console.log(i);
       var myUrl = base_url + '?client_id=' + client_id + '&client_secret=' + client_secret + '&ll=' + locations[i].location.lat + ',' + locations[i].location.lng +  '&limit=' + limit + '&v=' + version;
+
       $.getJSON(myUrl)
       .done(function(result) {
       var place = result.response.venues;
@@ -74,8 +77,10 @@ function setMainMarkers() {
       place.forEach(function(place) {
         myPlaces.push(new Place(place));
         console.log(myPlaces())
+        });
+      }).fail(function() {
+        alert( "Error Loading Main Places Request" );
       });
-    });
   }setTimeout( function() {googleMarkers();},1000);
 }
 
@@ -125,6 +130,7 @@ function googleMarkers() {
       map: map,
       position: position,
       title: title,
+      category: myPlaces()[i].category,
       draggable: true,
       animation: google.maps.Animation.DROP,
       icon: makeMarkerIcon('0091ff'),
@@ -208,11 +214,6 @@ function zoomToArea() {
   }
 }
 
-
-
-
-
-
 //Function for populating the googleMarkers info windows with
 //Google streetview services
 function populateInfoWindow(marker) {
@@ -232,7 +233,9 @@ function populateInfoWindow(marker) {
         var nearStreetViewLocation = data.location.latLng;
         var heading = google.maps.geometry.spherical.computeHeading(
           nearStreetViewLocation, marker.position);
-        infoWindow.setContent('<div>' + marker.title + '</div><div id="pano"></div>');
+        var innerHTML = {}
+        infoWindow.setContent('<div>' + marker.title + '<div id="pano"></div>'
+        + 'Category: ' + marker.category + '<br>' +'Powered by Foursquare' +'</div>');
         var panoramaOptions = {
           position: nearStreetViewLocation,
           pov: {
@@ -243,7 +246,7 @@ function populateInfoWindow(marker) {
         var panorama = new google.maps.StreetViewPanorama(
           document.getElementById('pano'), panoramaOptions);
       } else {
-        infoWindow.setContent('<div>' + marker.title + '</div>' +
+        infoWindow.setContent('<div>' + marker.title + 'Category: ' + marker.category + '<br>' + '</div>' +
           '<div>No Street View Found</div>');
       }
     };
@@ -268,8 +271,6 @@ function populateInfoWindow(marker) {
     }, 1400);
   }
 }
-
-
 
 
 //Foursquare api
@@ -330,12 +331,10 @@ $.getJSON(url)
     });
     marker.addListener('click', startSqaureWindow);
     Markers.push(marker);
-  }
-}).fail(function() {
-                // error loading API data
-                self.mapErrorAlert();
-                });
-
+    }
+  }).fail(function() {
+    alert( "Error Loading Top Picks Request" );
+  });
 //Create info windows for Four Sqaure markers
 function fourSquareInfoWindow(marker) {
   console.log(marker.title, 'clicked');
@@ -348,10 +347,16 @@ function fourSquareInfoWindow(marker) {
     innerHTML += '<br>' + marker.address;
   }
   if (marker.category) {
-    innerHTML += '<br>' + 'Category:' + marker.category;
+    innerHTML += '<br>' + 'Category: ' + marker.category;
+  }
+  if (marker.rating) {
+    innerHTML += '<br>' + 'Rating: ' + marker.rating;
   }
   if (marker.stats) {
     innerHTML += '<br>' + marker.stats + ' Checkins';
+  }
+  if (marker.website) {
+    innerHTML += '<br>' + marker.website;
   }
   innerHTML += '<br>' + 'Powered by FourSqaure' + '</div>';
   infoWindow.setContent(innerHTML);
