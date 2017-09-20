@@ -54,7 +54,20 @@ function initMap() {
 myPlaces = ko.observableArray([]);
 var Markers = ko.observableArray();
 
+markerCenter = function() {
+    map.addListener('center_changed', function() {
+         // 3 seconds after the center of the map has changed, pan back to the
+         // marker.
+         window.setTimeout(function() {
+           map.panTo(marker.getPosition());
+         }, 3000);
+       });
+}
 
+markerZoom = function() {
+    map.setZoom(16);
+    map.setCenter(marker.getPosition());
+}
 
 
 //function for setting the main markers on initMap
@@ -161,6 +174,8 @@ function googleMarkers() {
         });
         //Populate info window and attach listener to each marker
         marker.addListener('click', startWindow);
+        marker.addListener('click', markerZoom);
+        // marker.addListener('click', markerCenter);
         // Push the marker to our array of markers.
         Markers.push(marker);
     }
@@ -261,10 +276,6 @@ function populateInfoWindow(marker) {
             marker.setAnimation(null);
         }, 1400);
     }
-    marker.addListener('click', function() {
-      map.setZoom(15);
-      map.setCenter(marker.getPosition());
-    });
 }
 
 
@@ -326,6 +337,7 @@ $.getJSON(url)
                 category: venueArray()[i].category
             });
             marker.addListener('click', startSqaureWindow);
+            marker.addListener('click', markerZoom);
             Markers.push(marker);
         }
     }).fail(function() {
