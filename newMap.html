@@ -1,74 +1,63 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
     <title>Neighborhood Map</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="css/map.css">
-  </head>
-  <nav>
+</head>
+<nav>
     <ul class="nav nav-pills">
-      <button id="nav-toggle" role="presentation" type="button" data-bind="click: clickNav" class="btn btn-primary">Navigation</button>
+        <button id="nav-toggle" role="presentation" type="button" data-bind="click: clickNav" class="btn btn-primary">Navigation</button>
     </ul>
-  </nav>
+</nav>
+
 <body>
 
-<div class="container-fluid">
+    <div class="container-fluid">
 
 
-    <aside id="Nav">
+        <aside id="Nav">
 
 
-      <div class="options-box">
-        <h1>My Neighborhood Map</h1>
-        <div>
-          <input type="text" class="form-control" id="input" placeholder="Search" data-bind="textInput: query, valueUpdate: 'keydown'" autocomplete="off">
-          <div id="scroller">
-              <ul data-bind="template: { name: 'marker', foreach: markersFilter }" class="list-group border-0"></ul>
-              <script type="text/html" id="marker">
-                  <li class="list-group-item">
-                     <a href="#" data-bind="attr: {title: title}">
+            <div class="options-box">
+                <h1>My Neighborhood Map</h1>
+                <div>
+                    <input type="text" class="form-control" id="input" placeholder="Search" data-bind="textInput: query, valueUpdate: 'keydown'" autocomplete="off">
+                    <div id="scroller">
+                        <ul data-bind="template: { name: 'marker', foreach: markersFilter }" class="list-group border-0"></ul>
+                        <script type="text/html" id="marker">
+                            <li class="list-group-item">
+                                <a href="#" data-bind="attr: {title: title}">
                         <strong data-bind="text: title, click: populateInfoWindow"></strong>
                      </a>
-                  </li>
-              </script>
-          </div>
-        </div>
+                            </li>
+                        </script>
+                    </div>
+                </div>
 
-        <button id="show-markers" type="button" class="btn btn-primary" data-bind="click: showMarkers" name="button">Show Markers</button>
-        <button id="hide-markers" type="button" class="btn btn-default" data-bind="click: hideMarkers" name="button">Hide Markers</button>
+                <button id="show-markers" type="button" class="btn btn-primary" data-bind="click: showMarkers" name="button">Show Markers</button>
+                <button id="hide-markers" type="button" class="btn btn-default" data-bind="click: hideMarkers" name="button">Hide Markers</button>
 
-        <div class="row">
-        <div class="col-xs-3">
-          <div class="input-group">
-            <input id="zoom-to-area-text" type="text" class="form-control" data-bind="textInput: zoomToArea.inputAddress" placeholder="Input Area">
-              <span class="input-group-btn">
-                <button id="zoom-to-area" class="btn btn-default" data-bind="click: zoomToArea" type="button" name="buttton">Go!</button>
-              </span>
-          </div>
-        </div>
-        </div>
-
-      </div>
+            </div>
 
 
 
-   </aside>
+        </aside>
 
 
-
-   <main id="map"></main>
- </div>
+        <main id="map"></main>
+    </div>
 
 
 
 
 
-
-   <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
-   <script src="js/mapApp.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+    <script src="js/mapApp.js"></script>
 </body>
+
 </html>
