@@ -85,8 +85,8 @@ function setMainMarkers() {
     var client_secret = 'TK0JPEMFRNDXPCP4JKHWURAQILX2EQUVAEWWXQXCRMXDKE3V';
     var base_url = 'https://api.foursquare.com/v2/venues/search';
     var endpoint = '';
-    var limit = 1
-    var version = "20170101"
+    var limit = 1;
+    var version = "20170101";
 
 
     //Desireed place info for locations
@@ -97,9 +97,22 @@ function setMainMarkers() {
         this.phone = place.formattedPhone || "n/a";
         this.lat = place.location.lat;
         this.lng = place.location.lng;
-    }
+    };
 
     self.myArray = ko.observableArray([]);
+
+    var jsonSet = function(result) {
+        var place = result.response.venues;
+        // console.log(place);
+        place.forEach(function(place) {
+            myPlaces.push(new Place(place));
+            // console.log(myPlaces())
+        });
+    };
+
+    var locError = function() {
+        alert("Error Loading Main Places Request");
+    };
 
 
     //Loop through each locations LatLng for correlating foursquare data
@@ -109,17 +122,8 @@ function setMainMarkers() {
 
         //request foursquare data for current location
         $.getJSON(myUrl)
-            .done(function(result) {
-                var place = result.response.venues;
-                // console.log(place);
-                place.forEach(function(place) {
-                    myPlaces.push(new Place(place));
-                    // console.log(myPlaces())
-                });
-            }).fail(function() {
-                alert("Error Loading Main Places Request");
-            }); //Delay googleMarkers slightly to let myPlaces array set
-    }
+            .done(jsonSet).fail(locError);
+    }//Delay googleMarkers slightly to let myPlaces array set
     setTimeout(function() {
         googleMarkers();
     }, 1000);
@@ -143,7 +147,7 @@ function FilterModel() {
         var filter = ko.utils.arrayFilter(this.markers, function(marker) {
             if (marker.title.toLowerCase().indexOf(search) >= 0) {
                 marker.setVisible(true);
-                return marker
+                return marker;
             } else {
                 return marker.setVisible(false);
             }
@@ -164,7 +168,7 @@ function googleMarkers() {
     // Markers = ko.observableArray();
     for (var i = 0; i < myPlaces().length; i++) {
         // Get the position from the location array.
-        var position = new google.maps.LatLng(myPlaces()[i].lat, myPlaces()[i].lng)
+        var position = new google.maps.LatLng(myPlaces()[i].lat, myPlaces()[i].lng);
         var title = myPlaces()[i].name;
         // Create a marker per location, and put into markers array.
         var marker = new google.maps.Marker({
@@ -244,7 +248,7 @@ function populateInfoWindow(marker) {
                 var nearStreetViewLocation = data.location.latLng;
                 var heading = google.maps.geometry.spherical.computeHeading(
                     nearStreetViewLocation, marker.position);
-                var innerHTML = {}
+                var innerHTML = {};
                 infoWindow.setContent('<div>' + marker.title + '<div id="pano"></div>' +
                     'Category: ' + marker.category + '<br>' + 'Powered by Foursquare' + '</div>');
                 var panoramaOptions = {
@@ -292,7 +296,7 @@ var Venue = function(result) {
     this.lng = result.venue.location.lng;
     this.rating = result.venue.rating || "n/a";
     this.website = result.venue.url;
-    this.checkins = result.venue.stats.checkinsCount
+    this.checkins = result.venue.stats.checkinsCount;
     this.category = result.venue.categories[0].name;
     this.formattedAddress = result.venue.location.formattedAddress;
 };
@@ -317,7 +321,7 @@ $.getJSON(url)
             fourSquareInfoWindow(this, infoWindow);
         };
 
-        self.venueArray = ko.observableArray([])
+        self.venueArray = ko.observableArray([]);
 
         //Push each venue into ko array and convert foursqaure venue data into the object data that you want
         venues.forEach(function(result) {
@@ -327,7 +331,7 @@ $.getJSON(url)
         //Create google markers for each venue, push markers into global Markers array
         for (var i = 0; i < venueArray().length; i++) {
             // Get the position from the location array.
-            var position = new google.maps.LatLng(venueArray()[i].lat, venueArray()[i].lng)
+            var position = new google.maps.LatLng(venueArray()[i].lat, venueArray()[i].lng);
             var title = venueArray()[i].name;
             marker = new google.maps.Marker({
                 position: position,
@@ -392,7 +396,7 @@ function mapErrorAlert() {
 
 //Set initial status os display for first click
 var nav = document.getElementById('Nav');
-nav.style.display = 'block'
+nav.style.display = 'block';
 
 function clickNav() {
     if (nav.style.display == 'block')
