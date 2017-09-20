@@ -19,7 +19,7 @@
     <div class="container-fluid">
 
 
-        <aside id="Nav">
+        <aside id="Nav" data-bind="visible: visibleNav">
 
 
             <div class="options-box">
@@ -55,9 +55,11 @@
 
 
 
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="js/mapApp.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=AIzaSyBTZYzfTbP3yeBifwXQZm9VR9p5okWxyP4&v=3&callback=initMap"
+    async defer onerror="mapErrorAlert()"></script>
 </body>
 
 </html>

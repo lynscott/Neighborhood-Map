@@ -36,28 +36,6 @@ locations = [{
     }
 ];
 
-//Failed ajax request
-// $.ajax({
-//   url: "appData.json",
-//   dataType: "json"
-// })
-//   .done(function( data ) {
-//     locationsTest = data;
-//   });
-
-//load the google api with callback function
-function loadGoogle(src, callback) {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    if (callback) script.onload = callback;
-    document.getElementsByTagName("body")[0].appendChild(script);
-    script.src = src;
-    self.onerror = mapErrorAlert();
-}
-
-
-loadGoogle('https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyBTZYzfTbP3yeBifwXQZm9VR9p5okWxyP4&v=3&callback=initMap',
-    console.log('google has been loaded, but not the maps-API '));
 
 //Initialize google map after api is loaded
 function initMap() {
@@ -181,7 +159,18 @@ function googleMarkers() {
             icon: makeMarkerIcon('0091ff'),
             id: myPlaces()[i].id
         });
+        map.addListener('center_changed', function() {
+          // 3 seconds after the center of the map has changed, pan back to the
+          // marker.
+          window.setTimeout(function() {
+            map.panTo(marker.getPosition());
+          }, 3000);
+        });
 
+        marker.addListener('click', function() {
+          map.setZoom(15);
+          map.setCenter(marker.getPosition());
+        });
         //Populate info window and attach listener to each marker
         marker.addListener('click', startWindow);
         // Push the marker to our array of markers.
@@ -384,7 +373,7 @@ function fourSquareInfoWindow(marker) {
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
             marker.setAnimation(null);
-        }, 750);
+        }, 1400);
     }
 
 }
